@@ -1,0 +1,18 @@
+# PyTorch with MPS (Apple Silicon) support — installs from standard PyPI
+torch==2.4.*
+torchvision==0.19.*
+torchaudio==2.4.*
+
+# HuggingFace
+tokenizers==0.19.*
+transformers==4.44.*
+
+# Data & training utilities
+numpy==1.26.*
+pandas==2.2.*
+scikit-learn==1.5.*
+tqdm==4.66.*
+tensorboard==2.17.*
+
+# Serialization
+joblib==1.4.*

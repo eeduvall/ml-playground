@@ -1,0 +1,21 @@
+{
+  "model": "claude-sonnet-4-6",
+  "thinkingMode": true,
+  "outputStyle": "explanatory",
+  "allowedTools": ["Read", "Write", "Bash", "Grep"],
+  "protectedPaths": ["configs/", "*.yaml", "requirements.txt"],
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write",
+        "command": "ruff check ${file} && mypy ${file}"
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "command": "echo 'Running: ${command}'"
+      }
+    ]
+  }
+}
