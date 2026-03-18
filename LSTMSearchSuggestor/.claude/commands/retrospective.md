@@ -5,8 +5,3 @@ Review what happened in this session. Update .claude/skills/lstm-lessons/SKILL.m
 - Never deleting existing entries, only add or annotate them
 
 Session notes: $ARGUMENTS
-```
-
-Then use it like:
-```
-/retrospective hidden_dim 512 caused NaN loss on MPS, switched to 256 and fixed it
