@@ -45,9 +45,37 @@ def eval_epoch(model, loader, criterion, device):
     return total_loss / total_tokens
 
 
+def dedup_corpus(src: Path, dst: Path) -> tuple[int, int]:
+    seen: set[str] = set()
+    unique: list[str] = []
+    total = 0
+    with open(src) as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            total += 1
+            if line not in seen:
+                seen.add(line)
+                unique.append(line)
+    with open(dst, "w") as f:
+        f.write("\n".join(unique) + "\n")
+    return total, len(unique)
+
+
 def main(args):
     device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
     print(f"Device: {device}")
+
+    # Deduplicate corpus once; reuse on subsequent runs
+    src = Path(args.corpus)
+    deduped = src.with_stem(src.stem + "_deduped")
+    if not deduped.exists():
+        total, n_unique = dedup_corpus(src, deduped)
+        print(f"Deduplicated corpus: {total:,} → {n_unique:,} unique titles → {deduped}")
+    else:
+        print(f"Using existing deduplicated corpus: {deduped}")
+    corpus = deduped
 
     models_dir = Path(args.models_dir)
     models_dir.mkdir(exist_ok=True)
@@ -57,12 +85,12 @@ def main(args):
         vocab = Vocab.from_file(vocab_path)
         print(f"Loaded vocab ({len(vocab)} tokens)")
     else:
-        vocab = Vocab.from_corpus(args.corpus)
+        vocab = Vocab.from_corpus(corpus)
         vocab.save(vocab_path)
         print(f"Built vocab ({len(vocab)} tokens) → {vocab_path}")
 
     train_loader, val_loader = make_dataloaders(
-        args.corpus, vocab, batch_size=args.batch_size
+        corpus, vocab, batch_size=args.batch_size
     )
     print(f"Train batches: {len(train_loader)} | Val batches: {len(val_loader)}")
 
